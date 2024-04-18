@@ -24,11 +24,6 @@ const router = createRouter({
       component: () => import('../views/Answer.vue')
     },
     {
-      path: '/answerCheck',
-      name: 'AnswerCheck',
-      component: () => import('../views/AnswerCheck.vue')
-    },
-    {
       path: '/create',
       name: 'Create',
       component: () => import('../views/Create.vue')

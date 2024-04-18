@@ -14,7 +14,7 @@ export default {
 
 <template>
     <Logo />
-    <Search />
+    <!-- <Search /> -->
     <div class="plant"></div>
     <List />
 </template>

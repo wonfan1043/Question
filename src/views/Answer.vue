@@ -1,19 +1,49 @@
 <script>
 import Logo from '../components/TopLogo.vue';
+import AnswerSurvey from '../components/AnswerSurvey.vue';
 export default {
     data() {
         return {
-            title: "我是問卷名稱",
-            description: "我是問卷說明我是問卷說明我是問卷說明我是問卷說明我是問卷說明我是問卷說明我是問卷說明我是問卷說明我是問卷說明我是問卷說明我是問卷說明我是問卷說明",
-            name: "我是名字",
-            phone: "0800092000",
-            email: "我是信箱",
-            age: "18",
+            switch: false,
+            response: [],
+            answerList: [],
         }
     },
     components: {
         Logo,
-    }
+        AnswerSurvey
+    },
+    methods: {
+        iputFromAnswerSurvey(x) {
+            this.switch = !this.switch;
+            this.response = x;
+            console.log(this.response);
+            //單選答案
+            this.response[8][0].forEach(item => {
+                if (item != undefined) {
+                    let str = item.split("|");
+                    this.answerList[str[0]] = str[1];
+                }
+            });
+            //複選答案
+            this.response[8][1].forEach(item => {
+                let str = item.split("|");
+                if(this.answerList[str[0]] == undefined){
+                    this.answerList[str[0]] = str[1];
+                } else{
+                    this.answerList[str[0]] += '\n' + str[1];
+                }
+            })
+            //簡答答案
+            this.response[8][2].forEach(item => {
+                if (item != undefined) {
+                    let str = item.split("|");
+                    this.answerList[str[0]] = str[1];
+                }
+            })
+            console.log(this.answerList);
+        }
+    },
 }
 </script>
 
@@ -22,55 +52,37 @@ export default {
     <div class="imgL"></div>
     <div class="butterfly"></div>
     <div class="imgR"></div>
-    <div class="survey">
-        <h1 class="title border" v-text="this.title"></h1>
+    <AnswerSurvey v-if="!this.switch" @sendMail="iputFromAnswerSurvey" />
+    <div class="survey" v-if="this.switch">
+        <h1 class="title border">{{ this.response[0] }}</h1>
         <div class="basicInfo border">
-            <p class="description border" v-text="this.description"></p>
+            <p class="description border">{{ this.response[1] }}</p>
             <div class="personInfo border">
-                <label for="">姓名</label> &nbsp;
-                <input type="text" v-model="this.name"> &nbsp;
-                <label for="">手機</label> &nbsp;
-                <input type="number" v-model="this.phone"> <br>
-                <label for="">信箱</label> &nbsp;
-                <input type="text" v-model="this.email"> &nbsp;
-                <label for="">年齡</label> &nbsp;
-                <input type="number" v-model="this.age"> <br>
+                <label for="">姓名：&nbsp;</label>
+                <span>{{ this.response[3] }}</span> <br>
+                <label for="">手機：</label>
+                <span>{{ this.response[4] }}</span> <br>
+                <label for="">信箱：&nbsp;</label>
+                <span>{{ this.response[5] }}</span> <br>
+                <label for="">年齡：&nbsp;</label>
+                <span>{{ this.response[6] }}</span> <br>
             </div>
         </div>
-        <div class="answerSec border">
-            <h3 class="question border">我是題目1</h3>
-            <div class="border choice">
-                <input class="single" type="radio" name="我是題目1" required>&nbsp;<label for="">我是單選選項</label><br>
-                <input class="single" type="radio" name="我是題目1" required>&nbsp;<label for="">我是單選選項</label><br>
-                <input class="single" type="radio" name="我是題目1" required>&nbsp;<label for="">我是單選選項</label><br>
-                <input class="single" type="radio" name="我是題目1" required>&nbsp;<label for="">我是單選選項</label><br>
-            </div>
-            <h3 class="question border">我是題目2</h3>
-            <div class="border choice">
-                <input class="single" type="radio" name="我是題目2">&nbsp;<label for="">我是單選選項</label><br>
-                <input class="single" type="radio" name="我是題目2">&nbsp;<label for="">我是單選選項</label><br>
-                <input class="single" type="radio" name="我是題目2">&nbsp;<label for="">我是單選選項</label><br>
-                <input class="single" type="radio" name="我是題目2">&nbsp;<label for="">我是單選選項</label><br>
-            </div>
-            <h3 class="question border">我是題目3</h3>
-            <div class="border choice">
-                <input class="multi" type="checkbox" name="我是題目3" required>&nbsp;<label for="">我是複選選項</label><br>
-                <input class="multi" type="checkbox" name="我是題目3" required>&nbsp;<label for="">我是複選選項</label><br>
-                <input class="multi" type="checkbox" name="我是題目3" required>&nbsp;<label for="">我是複選選項</label><br>
-                <input class="multi" type="checkbox" name="我是題目3" required>&nbsp;<label for="">我是複選選項</label><br>
-            </div>
-            <h3 class="question border">我是題目4</h3>
-            <div class="border choice">
-                <textarea class="text" name="" id="" cols="30" rows="3"></textarea>
-            </div>
+        <!-- 題目區 -->
+        <div class="answerSec border" v-for="item in response[2]">
+            <!-- 題目 -->
+            <h3 class="question border">{{ `(${item.questionId}) ${item.question}` }}</h3>
+            <!-- 選項 -->
+            <pre class="border choice">{{ this.answerList[item.questionId] }}</pre><br>
         </div>
+        <!-- 按鈕 -->
         <div class="btn border">
-            <router-link class="router" to="/userHome">
+            <router-link class="router" to="/answer">
                 <button class="btnL" type="button">返回</button>
             </router-link>
-            <router-link to="/answerCheck">
-                <button type="button">下一步</button>
-            </router-link>
+            <!-- <router-link to="/userHome"> -->
+            <button type="button" @click="this.iputFromAnswer()">送出</button>
+            <!-- </router-link> -->
         </div>
     </div>
     <div class="footer"></div>
@@ -202,7 +214,8 @@ export default {
             font-weight: 1000;
         }
 
-        input {
+        span {
+            background-color: transparent;
             padding: 0.5% 1.5%;
             width: 41%;
             font-size: large;
@@ -234,25 +247,12 @@ export default {
     .choice {
         border-radius: 10px;
         width: 90%;
-        height: auto;
+        height:fit-content;
         padding: 1%;
         background-color: #abd8cc;
         margin-bottom: 0.5%;
-        font-size: large;
+        font-size: x-large;
     }
-
-    label {
-        background-color: transparent;
-    }
-
-    .text {
-        width: 100%;
-        margin-top: 0.5%;
-        font-weight: 600;
-        padding: 1%;
-        border-radius: 10px;
-    }
-
 }
 
 .btn {
