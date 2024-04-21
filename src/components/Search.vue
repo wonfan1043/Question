@@ -13,6 +13,10 @@ export default {
     },
     methods: {
         reqestSearch() {
+            if(this.from > this.to){
+                return alert("起始日不可小於結束日！");
+            }
+
             if (this.$route.path.startsWith('/adminHome')) {
                 this.backEnd = !this.backEnd;
             }
@@ -38,7 +42,7 @@ export default {
                 }
                 )
         }
-    },
+    }
 }
 </script>
 
@@ -46,7 +50,7 @@ export default {
     <div class="search">
         <div class="keyword inner">
             <label class="text" for="">問卷名稱</label>
-            <input class="text keywordText" type="text" v-model="this.word">
+            <input class="text keywordText" type="text" placeholder="請輸入關鍵字" v-model="this.word">
         </div>
         <div class="time inner">
             <label class="text" for="">日　　期</label>
@@ -122,7 +126,9 @@ export default {
         .keywordText {
             width: 87%;
             margin-right: 0;
-            padding: .2% 1%;
+            padding: .2% 1.5%;
+            font-size: 145%;
+            font-weight: 600;
         }
     }
 
@@ -149,6 +155,7 @@ export default {
             height: 100%;
             padding: 0.1% 1%;
             text-align: center;
+            font-size: 130%;
         }
     }
 

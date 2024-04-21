@@ -6,7 +6,7 @@ export default {
         return {
             switch: false,
             response: [],
-            answerList: [],
+            ansList: [],
         }
     },
     components: {
@@ -15,33 +15,75 @@ export default {
     },
     methods: {
         iputFromAnswerSurvey(x) {
-            this.switch = !this.switch;
+            this.switch = !this.switch
+            this.ansList = [];
             this.response = x;
-            console.log(this.response);
+            // console.log(this.response);
             //單選答案
             this.response[8][0].forEach(item => {
                 if (item != undefined) {
                     let str = item.split("|");
-                    this.answerList[str[0]] = str[1];
+                    this.ansList[str[0]] = str[1];
                 }
             });
             //複選答案
             this.response[8][1].forEach(item => {
                 let str = item.split("|");
-                if(this.answerList[str[0]] == undefined){
-                    this.answerList[str[0]] = str[1];
-                } else{
-                    this.answerList[str[0]] += '\n' + str[1];
+                if (this.ansList[str[0]] == undefined) {
+                    this.ansList[str[0]] = str[1];
+                } else {
+                    this.ansList[str[0]] += '\n' + str[1];
                 }
             })
             //簡答答案
             this.response[8][2].forEach(item => {
                 if (item != undefined) {
                     let str = item.split("|");
-                    this.answerList[str[0]] = str[1];
+                    this.ansList[str[0]] = str[1];
                 }
             })
-            console.log(this.answerList);
+        },
+        backToAnswerPage() {
+            this.switch = !this.switch
+        },
+        saveAns(){
+            // console.log(this.ansList);
+            // console.log(this.response);
+            let reqList = [];
+            let surveyId = localStorage.getItem("quizId");
+            let Name = this.response[3];
+            let Phone = this.response[4];
+            let Email = this.response[5];
+            let Age = this.response[6];
+            this.ansList.forEach(item => {
+                let obj = {
+                    name: Name,
+                    phone: Phone,
+                    email: Email,
+                    age: Age,
+                    quizId: surveyId,
+                    quId: this.ansList.indexOf(item),
+                    answer: String(item).replace('\n', ';')
+                }
+                console.log(obj);
+                reqList.push(obj);
+            })
+            // console.log(reqList);
+            let req = {
+                answerList: reqList,
+            }
+            fetch("http://localhost:8080/quiz/answer", {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(req)
+        })
+            .then(res => res.json())
+            .then((data) => {
+                console.log(data);
+            })
+        localStorage.removeItem("quizId");
         }
     },
 }
@@ -52,19 +94,21 @@ export default {
     <div class="imgL"></div>
     <div class="butterfly"></div>
     <div class="imgR"></div>
-    <AnswerSurvey v-if="!this.switch" @sendMail="iputFromAnswerSurvey" />
-    <div class="survey" v-if="this.switch">
+    <div v-show="!this.switch">
+        <AnswerSurvey @sendMail="iputFromAnswerSurvey"/>
+    </div>
+    <div class="survey2" v-if="this.switch">
         <h1 class="title border">{{ this.response[0] }}</h1>
         <div class="basicInfo border">
             <p class="description border">{{ this.response[1] }}</p>
             <div class="personInfo border">
-                <label for="">姓名：&nbsp;</label>
+                <label>姓名：&nbsp;</label>
                 <span>{{ this.response[3] }}</span> <br>
-                <label for="">手機：</label>
+                <label>手機：&nbsp;</label>
                 <span>{{ this.response[4] }}</span> <br>
-                <label for="">信箱：&nbsp;</label>
+                <label>信箱：&nbsp;</label>
                 <span>{{ this.response[5] }}</span> <br>
-                <label for="">年齡：&nbsp;</label>
+                <label>年齡：&nbsp;</label>
                 <span>{{ this.response[6] }}</span> <br>
             </div>
         </div>
@@ -73,19 +117,17 @@ export default {
             <!-- 題目 -->
             <h3 class="question border">{{ `(${item.questionId}) ${item.question}` }}</h3>
             <!-- 選項 -->
-            <pre class="border choice">{{ this.answerList[item.questionId] }}</pre><br>
+            <pre class="border choice">{{ this.ansList[item.questionId] }}</pre><br>
         </div>
         <!-- 按鈕 -->
         <div class="btn border">
-            <router-link class="router" to="/answer">
-                <button class="btnL" type="button">返回</button>
-            </router-link>
+            <button class="btnL" type="button" @click="backToAnswerPage">返回</button>
             <!-- <router-link to="/userHome"> -->
-            <button type="button" @click="this.iputFromAnswer()">送出</button>
+            <button type="button" @click="saveAns">送出</button>
             <!-- </router-link> -->
+            <div class="footer"></div>
         </div>
     </div>
-    <div class="footer"></div>
 </template>
 
 <style lang="scss" scoped>
@@ -93,7 +135,7 @@ export default {
     color: #135d66;
 }
 
-.survey {
+.survey2 {
     // border: 1px solid black;
     width: 87%;
     padding: 0;
@@ -199,7 +241,7 @@ export default {
         margin-top: 1%;
         margin-bottom: 2%;
         padding: 1% 3%;
-        font-weight: 550;
+        font-weight: 600;
     }
 
     .personInfo {
@@ -247,7 +289,7 @@ export default {
     .choice {
         border-radius: 10px;
         width: 90%;
-        height:fit-content;
+        height: fit-content;
         padding: 1%;
         background-color: #abd8cc;
         margin-bottom: 0.5%;

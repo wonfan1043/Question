@@ -24,14 +24,14 @@ const router = createRouter({
       component: () => import('../views/Answer.vue')
     },
     {
-      path: '/create',
-      name: 'Create',
-      component: () => import('../views/Create.vue')
-    },
-    {
       path: '/createCheck',
       name: 'CreateCheck',
       component: () => import('../views/CreateCheck.vue')
+    },
+    {
+      path: '/reviseCheck',
+      name: 'ReviseCheck',
+      component: () => import('../views/ReviseCheck.vue')
     },
     {
       path: '/allRes',

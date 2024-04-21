@@ -1,12 +1,10 @@
 <script>
 import Logo from '../components/TopLogo.vue';
-import Search from '../components/Search.vue';
 import List from '../components/AdminList.vue';
 
 export default {
     components:{
         Logo,
-        Search,
         List
     }
 }
@@ -14,7 +12,6 @@ export default {
 
 <template>
     <Logo />
-    <!-- <Search /> -->
     <div class="plant"></div>
     <List />
 </template>

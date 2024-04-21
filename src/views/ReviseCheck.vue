@@ -1,6 +1,6 @@
 <script>
 import Logo from '../components/TopLogo.vue';
-import Create from '../components/Create.vue';
+import Revise from '../components/Revise.vue';
 export default {
     data() {
         return {
@@ -20,7 +20,7 @@ export default {
     },
     components: {
         Logo,
-        Create
+        Revise
     },
     methods: {
         receiveMail(mail) {
@@ -51,27 +51,12 @@ export default {
                 }
             }
             console.log(this.choiceList);
-            this.getQuizId();
-        },
-        getQuizId(){
-            fetch("http://localhost:8080/quiz/new_quiz_id", {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json"
-                },
-            })
-                .then(res => res.json())
-                .then((data) => {
-                    console.log(data);
-                    this.quizId = data.code;
-                    console.log(this.quizId);
-                }
-                )
         },
         change(){
             this.switch = !this.switch
         },
         saveOnly() {
+            this.quizId = localStorage.getItem("quizId");
             console.log(this.quizId);
             this.quesList.splice(0, 1);
             console.log(this.quesList);
@@ -86,15 +71,15 @@ export default {
                 let quiz = {
                     quiz_id: this.quizId,
                     question_id: this.quIdList[i],
-                        quiz_name: this.title,
-                        quiz_description: this.description,
-                        start_date: this.startDate,
-                        end_date: this.endDate,
-                        question_name: this.quesList[i],
-                        question_type: String(this.quesTypeList[i]),
-                        is_necessary: this.isRequiredList[i],
-                        question_options: this.choiceList[i],
-                        is_published: false
+                    quiz_name: this.title,
+                    quiz_description: this.description,
+                    start_date: this.startDate,
+                    end_date: this.endDate,
+                    question_name: this.quesList[i],
+                    question_type: String(this.quesTypeList[i]),
+                    is_necessary: this.isRequiredList[i],
+                    question_options: this.choiceList[i],
+                    is_published: false
                     }
                     quizList.push(quiz);
                 }
@@ -104,7 +89,7 @@ export default {
                 is_published: false
             }
             console.log(req);
-            fetch("http://localhost:8080/quiz/create", {
+            fetch("http://localhost:8080/quiz/update", {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json"
@@ -116,8 +101,10 @@ export default {
                     console.log(data);
                 }
                 )
+            localStorage.removeItem("quizId");
         },
         saveAndPublish(){
+            this.quizId = localStorage.getItem("quizId");
             console.log(this.quizId);
             this.quesList.splice(0, 1);
             console.log(this.quesList);
@@ -132,15 +119,15 @@ export default {
                 let quiz = {
                     quiz_id: this.quizId,
                     question_id: this.quIdList[i],
-                        quiz_name: this.title,
-                        quiz_description: this.description,
-                        start_date: this.startDate,
-                        end_date: this.endDate,
-                        question_name: this.quesList[i],
-                        question_type: String(this.quesTypeList[i]),
-                        is_necessary: this.isRequiredList[i],
-                        question_options: this.choiceList[i],
-                        is_published: true
+                    quiz_name: this.title,
+                    quiz_description: this.description,
+                    start_date: this.startDate,
+                    end_date: this.endDate,
+                    question_name: this.quesList[i],
+                    question_type: String(this.quesTypeList[i]),
+                    is_necessary: this.isRequiredList[i],
+                    question_options: this.choiceList[i],
+                    is_published: true
                     }
                     quizList.push(quiz);
                 }
@@ -150,7 +137,7 @@ export default {
                 is_published: true
             }
             console.log(req);
-            fetch("http://localhost:8080/quiz/create", {
+            fetch("http://localhost:8080/quiz/update", {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json"
@@ -162,8 +149,9 @@ export default {
                     console.log(data);
                 }
                 )
+            localStorage.removeItem("quizId");
         }
-    },
+    }
 }
 </script>
 
@@ -173,7 +161,7 @@ export default {
     <div class="butterfly"></div>
     <div class="imgR"></div>
     <div v-show="!this.switch">
-        <Create @sendMail="receiveMail" />
+        <Revise @sendMail="receiveMail" />
     </div>
     <div class="survey" v-if="this.switch">
         <h1 class="title border">{{ this.title }}</h1>

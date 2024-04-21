@@ -119,7 +119,7 @@ export default {
 
             button {
                 color: #ceede5;
-                font-size: large;
+                font-size: larger;
                 font-weight: 600;
                 background-color: transparent;
                 border: none;
